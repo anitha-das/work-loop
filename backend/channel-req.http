@@ -1,0 +1,69 @@
+### Create Public Channel
+POST http://localhost:5000/channel-api/channels
+Content-Type: application/json
+
+{
+  "workspace": "69fabe65ee0e8df73ddaf3dc",
+  "channelName": "general",
+  "description": "Main public channel",
+  "channelType": "PUBLIC"
+}
+
+
+### Create Private Channel
+POST http://localhost:5000/channel-api/channels
+Content-Type: application/json
+
+{
+  "workspace": "69fabe65ee0e8df73ddaf3dc",
+  "channelName": "private-team",
+  "description": "Private channel for selected members",
+  "channelType": "PRIVATE"
+}
+
+
+### Get Channels Of Workspace
+GET http://localhost:5000/channel-api/channels/69fabe65ee0e8df73ddaf3dc
+
+
+### Get Single Channel
+GET http://localhost:5000/channel-api/channel/69f8cf70bf5754b4922b85f1
+
+
+### Add Member To Channel
+PUT http://localhost:5000/channel-api/channel/member
+Content-Type: application/json
+
+{
+  "channelId": "69fac00bee0e8df73ddaf3f0",
+  "email": "user2@mail.com"
+}
+
+
+### Leave Channel
+PATCH http://localhost:5000/channel-api/channel/leave
+Content-Type: application/json
+
+{
+  "channelId": "69fac00bee0e8df73ddaf3f0"
+}
+
+
+### Soft Delete Channel
+PATCH http://localhost:5000/channel-api/channel/status
+Content-Type: application/json
+
+{
+  "channelId": "69fac00bee0e8df73ddaf3f0",
+  "isChannelActive": false
+}
+
+
+### Restore Channel
+PATCH http://localhost:5000/channel-api/channel/status
+Content-Type: application/json
+
+{
+  "channelId": "69fac00bee0e8df73ddaf3f0",
+  "isChannelActive": true
+}

@@ -1,0 +1,78 @@
+### Register User
+POST http://localhost:5000/auth/users
+Content-Type: application/json
+
+{
+  "firstName": "user1",
+  "lastName": "test",
+  "email": "user1@mail.com",
+  "password": "user1",
+  "role": "USER",
+  "profileImageUrl": "https://example.com/user.png"
+}
+
+### Register User 2
+POST http://localhost:5000/auth/users
+Content-Type: application/json
+
+{
+  "firstName": "user4",
+  "lastName": "test",
+  "email": "user4@mail.com",
+  "password": "user4",
+  "role": "USER",
+  "profileImageUrl": "https://example.com/user4.png"
+}
+
+
+### Register Admin
+POST http://localhost:5000/auth/users
+Content-Type: application/json
+
+{
+  "firstName": "admin",
+  "lastName": "test",
+  "email": "admin@mail.com",
+  "password": "admin",
+  "role": "ADMIN",
+  "profileImageUrl": "https://example.com/admin.png"
+}
+
+
+### User Login
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+  "email": "user1@mail.com",
+  "password": "user1"
+}
+
+
+### Admin Login
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@mail.com",
+  "password": "admin"
+}
+
+
+### Check Auth
+GET http://localhost:5000/auth/check-auth
+
+
+### Change Password
+PUT http://localhost:5000/auth/password
+Content-Type: application/json
+
+{
+  "currentPassword": "user1",
+  "newPassword": "user@1"
+}
+
+
+### Logout
+GET http://localhost:5000/auth/logout
+

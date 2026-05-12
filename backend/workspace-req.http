@@ -1,0 +1,59 @@
+### Create Workspace
+POST http://localhost:5000/workspace-api/workspaces
+Content-Type: application/json
+
+{
+  "workspaceName": "Team Workspace",
+  "description": "Main workspace for team communication"
+}
+
+
+### Get My Workspaces
+GET http://localhost:5000/workspace-api/workspaces
+
+
+
+### Get Single Workspace
+GET http://localhost:5000/workspace-api/workspace/69f8cc87bf5754b4922b85d6
+
+
+### Add Member To Workspace
+PUT http://localhost:5000/workspace-api/workspace/member
+Content-Type: application/json
+
+{
+  "workspaceId": "69fabe65ee0e8df73ddaf3dc",
+  "email": "user2@mail.com",
+  "role": "MEMBER"
+}
+
+
+### Add Admin Member To Workspace
+PUT http://localhost:5000/workspace-api/workspace/member
+Content-Type: application/json
+
+{
+  "workspaceId": "69fabe65ee0e8df73ddaf3dc",
+  "email": "admin@mail.com",
+  "role": "ADMIN"
+}
+
+
+### Soft Delete Workspace
+PATCH http://localhost:5000/workspace-api/workspace/status
+Content-Type: application/json
+
+{
+  "workspaceId": "69fabe65ee0e8df73ddaf3dc",
+  "isWorkspaceActive": false
+}
+
+
+### Restore Workspace
+PATCH http://localhost:5000/workspace-api/workspace/status
+Content-Type: application/json
+
+{
+  "workspaceId": "69fabe65ee0e8df73ddaf3dc",
+  "isWorkspaceActive": true
+}
