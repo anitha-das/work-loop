@@ -15,7 +15,7 @@ import {
   textarea,
 } from "../styles/common";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || " https://work-loop.onrender.com";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://work-loop.onrender.com";
 const requestConfig = { withCredentials: true };
 
 const initialForm = {
