@@ -22,7 +22,8 @@ const app = exp();
 const httpServer = createServer(app);
 
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin:["http://localhost:5173",
+          "https://work-loop-1go2vscy6-anitha-das-projects.vercel.app"],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"]
