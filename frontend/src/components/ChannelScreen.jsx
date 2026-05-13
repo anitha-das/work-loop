@@ -14,7 +14,7 @@ import {
   mutedText,
 } from "../styles/common";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://work-loop.onrender.com";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 const requestConfig = { withCredentials: true };
 
 const getId = (value) => {
@@ -125,12 +125,14 @@ function ChannelScreen({
           <p style={mutedText}>Select a channel to start chatting.</p>
         ) : (
           <>
+
             <MessageList
-              key={`${resolvedChannelId}-${messageRefreshKey}`}
               currentUser={authUser || currentUser}
               channelId={resolvedChannelId}
+              refreshKey={messageRefreshKey}
               onOpenThread={setThreadMessage}
             />
+
 
             <MessageInput
               workspace={workspace}

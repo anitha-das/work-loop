@@ -1,9 +1,9 @@
 import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import MessageItem from "./MessageItem";
 import { emptyState, errorText, loading as loadingStyle, messageList } from "../styles/common";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://work-loop.onrender.com";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 const requestConfig = { withCredentials: true };
 
 const getErrorMessage = (err) =>
@@ -20,12 +20,14 @@ function MessageList({
   workspaceId,
   receiverId,
   onMessagesChange,
+  refreshKey,
   onOpenThread,
 }) {
   const [messages, setMessages] = useState(messagesProp || []);
   const [hiddenMessageIds, setHiddenMessageIds] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const messagesEndRef = useRef(null);
   const visibleMessages = messagesProp || messages;
   const displayedMessages = visibleMessages.filter(
     (message) => !hiddenMessageIds.includes(message._id)
@@ -76,13 +78,19 @@ function MessageList({
     }
   }, [channelId, messageType, messagesProp, receiverId, updateMessages, workspaceId]);
 
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      loadMessages();
-    }, 0);
+useEffect(() => {
+  const timerId = setTimeout(() => {
+    loadMessages();
+  }, 0);
 
-    return () => clearTimeout(timerId);
-  }, [loadMessages]);
+  return () => clearTimeout(timerId);
+}, [loadMessages, refreshKey]);
+
+useEffect(() => {
+  messagesEndRef.current?.scrollIntoView({
+    behavior: "smooth",
+  });
+}, [displayedMessages]);
 
   const handleEdit = async (messageId, content) => {
     try {
@@ -189,14 +197,17 @@ function MessageList({
     return <div style={loadingStyle}>Loading messages...</div>;
   }
 
-  return (
-    <div style={messageList}>
-      {error && <p style={errorText}>{error}</p>}
+return (
+  <div style={messageList}>
+    {error && <p style={errorText}>{error}</p>}
 
-      {displayedMessages.length === 0 ? (
-        <div style={emptyState}>No messages yet. Start the conversation.</div>
-      ) : (
-        displayedMessages.map((message) => (
+    {displayedMessages.length === 0 ? (
+      <div style={emptyState}>
+        No messages yet. Start the conversation.
+      </div>
+    ) : (
+      <>
+        {displayedMessages.map((message) => (
           <MessageItem
             key={message._id}
             message={message}
@@ -207,10 +218,13 @@ function MessageList({
             onRemoveReaction={handleRemoveReaction}
             onOpenThread={handleOpenThread}
           />
-        ))
-      )}
-    </div>
-  );
+        ))}
+
+        <div ref={messagesEndRef} />
+      </>
+    )}
+  </div>
+);
 }
 
 export default MessageList;

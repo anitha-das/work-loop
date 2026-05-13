@@ -11,7 +11,7 @@ import {
   notificationUnread,
 } from "../styles/common";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://work-loop.onrender.com";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 const requestConfig = { withCredentials: true };
 
 const getId = (value) => {
@@ -48,14 +48,14 @@ function NotificationList({
   const [error, setError] = useState("");
   const autoReadKeyRef = useRef("");
   const sourceNotifications = notificationsProp ?? notifications;
- const visibleNotifications = (
-  workspaceId
-    ? sourceNotifications.filter(
+  const visibleNotifications = (
+    workspaceId
+      ? sourceNotifications.filter(
         (item) =>
           getId(item.workspace) === workspaceId
       )
-    : sourceNotifications
-).filter((item) => !item.isRead);
+      : sourceNotifications
+  ).filter((item) => !item.isRead);
   const visibleUnreadKey = visibleNotifications
     .filter((item) => !item.isRead)
     .map((item) => getId(item))
@@ -163,30 +163,35 @@ function NotificationList({
   return (
     <section>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "14px",
-        }}
-      >
-        <button
-          type="button"
-          onClick={markAllAsRead}
-          style={{
-            border: "none",
-            borderRadius: "8px",
-            padding: "8px 12px",
-            backgroundColor: "#611f69",
-            color: "#ffffff",
-            fontSize: "13px",
-            fontWeight: 700,
-            cursor: "pointer",
-          }}
-        >
-          Mark all as read
-        </button>
-      </div>
+      {visibleNotifications.some(
+        (notification) => !notification.isRead
+      ) && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginBottom: "14px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={markAllAsRead}
+              style={{
+                border: "none",
+                borderRadius: "8px",
+                padding: "8px 12px",
+                backgroundColor: "#611f69",
+                color: "#ffffff",
+                fontSize: "13px",
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+            >
+              Mark all as read
+            </button>
+          </div>
+        )}
+
 
       {error && <p style={errorText}>{error}</p>}
 

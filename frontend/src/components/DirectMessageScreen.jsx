@@ -14,7 +14,7 @@ import {
   mutedText,
 } from "../styles/common";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://work-loop.onrender.com";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 const requestConfig = { withCredentials: true };
 
 const getId = (value) => {
@@ -131,14 +131,17 @@ function DirectMessageScreen({
           <p style={mutedText}>Select a teammate to start a direct message.</p>
         ) : (
           <>
+
             <MessageList
-              key={`${resolvedWorkspaceId}-${resolvedReceiverId}-${messageRefreshKey}`}
               currentUser={authUser || currentUser}
               messageType="DIRECT"
               workspaceId={resolvedWorkspaceId}
               receiverId={resolvedReceiverId}
+              refreshKey={messageRefreshKey}
               onOpenThread={setThreadMessage}
             />
+
+
 
             <MessageInput
               workspace={workspace}
