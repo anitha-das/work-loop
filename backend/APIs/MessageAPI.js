@@ -6,6 +6,7 @@ import { MessageModel } from "../models/MessageModel.js";
 import { NotificationModel } from "../models/NotificationModel.js";
 import { upload } from "../config/multer.js";
 import { uploadToCloudinary } from "../config/cloudinaryUpload.js";
+import { getIO } from "../sockets/socket.js";
 
 export const messageApp = exp.Router();
 
@@ -357,6 +358,21 @@ messageApp.post(
             "reactions.user",
             "firstName lastName email profileImageUrl"
           );
+      const io = getIO();
+
+      const roomId = [
+        populatedMessage.sender._id.toString(),
+        populatedMessage.receiver._id.toString(),
+      ]
+        .sort()
+        .join("-");
+
+      io.to(`dm-${roomId}`).emit(
+        "receive-message",
+        {
+          payload: populatedMessage,
+        }
+      );
 
       res.status(201).json({
         message:
@@ -388,7 +404,18 @@ messageApp.post("/file-message", verifyToken("USER", "ADMIN"), upload.single("fi
       });
     }
 
-    const result = await uploadToCloudinary(req.file.buffer);
+    const resourceType =
+      req.file.mimetype === "application/pdf"
+        ? "raw"
+        : "auto";
+
+    const result = await uploadToCloudinary(
+      req.file.buffer,
+      resourceType,
+      req.file.mimetype === "application/pdf"
+        ? "pdf"
+        : null
+    );
 
     messageObj.sender = userId;
     messageObj.file = {
@@ -532,7 +559,7 @@ messageApp.get(
       const directReminders =
         await MessageModel.find({
           receiver: userId,
-         reminderTime: { $ne: null },
+          reminderTime: { $ne: null },
           isMessageActive: true,
         })
           .populate(
@@ -771,6 +798,15 @@ messageApp.post(
           "sender",
           "firstName lastName email profileImageUrl"
         );
+
+      const io = getIO();
+
+      io.to(`channel-${parentMessage.channel}`).emit(
+        "receive-thread-reply",
+        {
+          payload: populatedReply,
+        }
+      );
 
       res.status(201).json({
         message:

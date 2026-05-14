@@ -2,7 +2,7 @@ import { create } from "zustand";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://work-loop.onrender.com";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 const requestConfig = { withCredentials: true };
 
 const api = axios.create({
@@ -697,6 +697,11 @@ export const useChat = create((set, get) => ({
 
     socket.on("socket-error", (data) => {
       set({ error: data?.error || data?.message || "Socket error" });
+    });
+    socket.on("online-users", (users) => {
+      set({
+        onlineUsers: users || [],
+      });
     });
 
     socket.on("user-online", (data) => {

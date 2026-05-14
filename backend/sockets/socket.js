@@ -8,6 +8,9 @@ import { registerSocketEvents } from "./socketEvents.js";
 const { verify } = jwt;
 
 config();
+let io;
+
+const onlineUsers = new Map();
 
 const getTokenFromCookie = (cookieHeader) => {
   const tokenCookie = cookieHeader
@@ -20,7 +23,7 @@ const getTokenFromCookie = (cookieHeader) => {
 };
 
 export const initializeSocket = (httpServer) => {
-  const io = new Server(httpServer, {
+   io = new Server(httpServer, {
     cors: {
       origin: process.env.CLIENT_URL,
       credentials: true,
@@ -28,6 +31,7 @@ export const initializeSocket = (httpServer) => {
     },
   });
 
+  
   io.use(async (socket, next) => {
     try {
       let token = socket.handshake.auth?.token;
@@ -69,28 +73,47 @@ export const initializeSocket = (httpServer) => {
 
     socket.join(`user-${userId}`);
 
-    if (redisClient.isOpen) {
-      await redisClient.set(`online-user-${userId}`, socket.id);
+    // store socket id
+    if (!onlineUsers.has(userId)) {
+      onlineUsers.set(userId, new Set());
     }
 
-    socket.broadcast.emit("user-online", {
-      message: "User online",
+    onlineUsers.get(userId).add(socket.id);
+
+    // send current online users to newly connected user
+    socket.emit("online-users", Array.from(onlineUsers.keys()));
+
+    // notify everyone
+    io.emit("user-online", {
       payload: { userId },
     });
 
     registerSocketEvents(io, socket);
 
     socket.on("disconnect", async () => {
-      if (redisClient.isOpen) {
-        await redisClient.del(`online-user-${userId}`);
-      }
 
-      socket.broadcast.emit("user-offline", {
-        message: "User offline",
-        payload: { userId },
-      });
+      const userSockets = onlineUsers.get(userId);
+
+      if (userSockets) {
+        userSockets.delete(socket.id);
+
+        if (userSockets.size === 0) {
+          onlineUsers.delete(userId);
+
+          io.emit("user-offline", {
+            payload: { userId },
+          });
+        }
+      }
     });
   });
 
   console.log("Socket connected");
+};
+
+export const getIO = () => {
+  if (!io) {
+    throw new Error("Socket.io not initialized");
+  }
+  return io;
 };

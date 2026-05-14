@@ -43,42 +43,56 @@ export const registerSocketEvents = (io, socket) => {
   // Send real-time message
   socket.on("send-message", async (messageObj) => {
     try {
-      const newMessage = new MessageModel({
-        ...messageObj,
-        sender: socket.user?.id,
-      });
 
-      await newMessage.save();
+      const newMessage = messageObj;
 
       if (newMessage.messageType === "CHANNEL") {
-        io.to(`channel-${newMessage.channel}`).emit("receive-message", {
-          message: "Message received",
-          payload: newMessage,
-        });
+
+        io.to(`channel-${newMessage.channel}`).emit(
+          "receive-message",
+          {
+            message: "Message received",
+            payload: newMessage,
+          }
+        );
       }
 
       if (newMessage.messageType === "DIRECT") {
-        const roomId = [newMessage.sender.toString(), newMessage.receiver.toString()].sort().join("-");
 
-        io.to(`dm-${roomId}`).emit("receive-message", {
-          message: "Message received",
-          payload: newMessage,
-        });
+        const roomId = [
+          newMessage.sender.toString(),
+          newMessage.receiver.toString(),
+        ]
+          .sort()
+          .join("-");
 
-        io.to(`user-${newMessage.receiver}`).emit("new-notification", {
-          message: "New notification",
-          payload: {
-            notificationType: "MESSAGE",
-            text: "You received a new direct message",
-          },
-        });
+        io.to(`dm-${roomId}`).emit(
+          "receive-message",
+          {
+            message: "Message received",
+            payload: newMessage,
+          }
+        );
+
+        io.to(`user-${newMessage.receiver}`).emit(
+          "new-notification",
+          {
+            message: "New notification",
+            payload: {
+              notificationType: "MESSAGE",
+              text: "You received a new direct message",
+            },
+          }
+        );
       }
 
     } catch (err) {
+
       socket.emit("socket-error", {
         message: "Error sending message",
         error: err.message,
       });
+
     }
   });
 
@@ -232,58 +246,6 @@ export const registerSocketEvents = (io, socket) => {
       });
     }
   });
-
-
-  // Add thread reply
-  socket.on("thread-reply", async (replyObj) => {
-    try {
-      const { messageId, content } = replyObj;
-
-      const messageDoc = await MessageModel.findOne({
-        _id: messageId,
-        isMessageActive: true,
-      });
-
-      if (!messageDoc) {
-        return socket.emit("socket-error", {
-          message: "Message not found",
-          error: "Invalid message id",
-        });
-      }
-
-      messageDoc.threadReplies.push({
-        sender: socket.user?.id,
-        content,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
-      await messageDoc.save();
-
-      if (messageDoc.messageType === "CHANNEL") {
-        io.to(`channel-${messageDoc.channel}`).emit("thread-reply-added", {
-          message: "Thread reply added",
-          payload: messageDoc,
-        });
-      }
-
-      if (messageDoc.messageType === "DIRECT") {
-        const roomId = [messageDoc.sender.toString(), messageDoc.receiver.toString()].sort().join("-");
-
-        io.to(`dm-${roomId}`).emit("thread-reply-added", {
-          message: "Thread reply added",
-          payload: messageDoc,
-        });
-      }
-
-    } catch (err) {
-      socket.emit("socket-error", {
-        message: "Error adding thread reply",
-        error: err.message,
-      });
-    }
-  });
-
 
   // File shared after REST upload
   socket.on("file-shared", (messageObj) => {

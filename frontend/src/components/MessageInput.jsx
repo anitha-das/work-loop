@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
+import { useChat } from "../store/chatStore";
 import {
   composerInput,
   composerToolbar,
@@ -18,7 +19,7 @@ import {
   successText,
 } from "../styles/common";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://work-loop.onrender.com";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 const requestConfig = { withCredentials: true };
 
 const getId = (value) => {
@@ -52,6 +53,7 @@ function MessageInput({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const { sendSocketMessage } = useChat();
 
   useEffect(() => {
     if (!success) {
@@ -149,6 +151,10 @@ function MessageInput({
       setSuccess("");
 
       const res = file ? await sendFileMessage() : await sendTextMessage();
+
+      if (!file && res.data?.payload) {
+        sendSocketMessage(res.data.payload);
+      }
 
       resetForm();
       setSuccess("Message sent");
