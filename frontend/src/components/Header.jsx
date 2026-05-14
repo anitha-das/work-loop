@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../store/authStore";
 import ProfileMenu from "./ProfileMenu";
+import logo from "../assets/workloop-logo.jpeg";
 import {
   brand,
   brandMark,
@@ -22,17 +23,24 @@ function Header() {
   return (
     <header style={headerBar}>
       <NavLink to="/" style={brand}>
-        <span style={brandMark}>S</span>
-        <span>Slack Clone</span>
+        <img
+          src={logo}
+          alt="WorkLoop"
+          style={{
+            height: "170px",
+            width: "auto",
+            objectFit: "contain",
+          }}
+        />
       </NavLink>
 
       <nav style={navActions}>
         <NavLink to="/" style={linkText}>
-              Home
-            </NavLink>
+          Home
+        </NavLink>
         {isAuthenticated && currentUser ? (
           <>
-            
+
 
             <NavLink
               to={currentUser.role === "ADMIN" ? "/admin" : "/workspace"}
