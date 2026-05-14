@@ -173,7 +173,7 @@ function Home() {
 
                   <div>
                     <div style={styles.messageMeta}>
-                      Rahul · 10:08 AM
+                      Krishna · 10:08 AM
                     </div>
 
                     <div style={styles.messageBubble}>
@@ -190,7 +190,7 @@ function Home() {
 
                   <div>
                     <div style={styles.messageMeta}>
-                      Maya · 10:12 AM
+                      Radha · 10:12 AM
                     </div>
 
                     <div style={styles.messageBubble}>
